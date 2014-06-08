@@ -22,7 +22,8 @@ function start() {
 
     var gr = dnd.createGhostItem(svg.append("rect").style({
         "opacity": 0.5,
-        "fill": "none"
+        "fill": "none",
+        "stroke": "none"
     }), function(gi, d) {
         gi.x = d.x;
         gi.y = d.y;
@@ -32,7 +33,8 @@ function start() {
             "width": d.w,
             "height": d.h
         }).style({
-            "fill": d.c
+            "fill": d.c,
+            "stroke": "black"
         });
     }, function(gi, dx, dy) {
         gi.x += dx;
@@ -43,7 +45,8 @@ function start() {
         });
     }, function(gi) {
         gi.elem.style({
-            "fill": "none"
+            "fill": "none",
+            "stroke": "none"
         })
     });
     var srcCopy = dnd.createSourceType(gr, function() {}, function() {}, function() {});
@@ -77,12 +80,13 @@ function start() {
         "width": function(d) { return d.w; },
         "height": function(d) { return d.h; }
     }).style({
-        "fill": function(d) { return d.c; }
+        "fill": function(d) { return d.c; },
+        "stroke": "black"
     });
     rects.exit().remove();
     srcCopy.register(rects);
-    tgtCopy.register(svg, function() {}, function() {}, function(g, d) {
-        var newRect = svg.append("rect").datum({
+    tgtCopy.register(svg, function() {}, function() {}, function(g, _, d, _, s) {
+        var newRect = s.append("rect").datum({
             id: id++,
             c: d.c,
             x: g.x,
@@ -95,13 +99,14 @@ function start() {
             "width": d.w,
             "height": d.h
         }).style({
-            "fill": d.c
+            "fill": d.c,
+            "stroke": "black"
         });
         srcMove.register(newRect);
-        tgtMove.register(svg, function() {}, function() {}, function(g, d) {
+        tgtMove.register(s, function() {}, function() {}, function(g, sel, d) {
             d.x = g.x;
             d.y = g.y;
-            newRect.attr({
+            sel.attr({
                 "x": d.x,
                 "y": d.y
             });
