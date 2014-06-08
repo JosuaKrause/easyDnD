@@ -73,7 +73,7 @@ function initDnD() {
         var id = targetCount++;
         var that = {
             id: function() { return id; },
-            register: function(selection, hover, leave, drop) {
+            register: function(selection, drop, hover, leave) {
                 var mor = selection.on("mouseover");
                 var mot = selection.on("mouseout");
                 selection.on("mouseover", function(d, i) {
@@ -86,13 +86,13 @@ function initDnD() {
                     curTarget = that;
                     curTargetSel = d3.select(this);
                     curTargetObj = this;
-                    hover(dragSel, dragObj, curTargetSel, curTargetObj);
+                    hover && hover(dragSel, dragObj, curTargetSel, curTargetObj);
                     if(curTargetObj.__drop_target === undefined) {
                         curTargetObj.__drop_target = {};
                     }
                     curTargetObj.__drop_target[id] = function(g, dragSel, dragObj) {
                         drop(g, dragSel, dragObj, curTargetSel, curTargetObj);
-                        leave(dragSel, dragObj, curTargetSel, curTargetObj);
+                        leave && leave(dragSel, dragObj, curTargetSel, curTargetObj);
                     };
                 }).on("mouseout", function(d, i) {
                     if(mot !== undefined) {
@@ -103,7 +103,7 @@ function initDnD() {
                     if(!src.isTarget(that)) return;
                     if(curTarget !== that) return;
                     if(curTargetObj !== this) return;
-                    leave(dragSel, dragObj, curTargetSel, curTargetObj);
+                    leave && leave(dragSel, dragObj, curTargetSel, curTargetObj);
                     curTarget = null;
                     curTargetObj = null;
                     curTargetSel = null;

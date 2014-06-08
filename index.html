@@ -27,22 +27,15 @@ function start() {
     }), function(gi, _, d) {
         gi.x = d.x;
         gi.y = d.y;
-        gi.elem.attr({
-            "x": gi.x,
-            "y": gi.y,
-            "width": d.w,
-            "height": d.h
-        }).style({
-            "fill": d.c,
-            "stroke": "black"
-        });
+        gi.w = d.w;
+        gi.h = d.h;
+        gi.c = d.c;
+        gi.elem.datum(gi);
+        updateRects(gi.elem);
     }, function(gi, dx, dy) {
         gi.x += dx;
         gi.y += dy;
-        gi.elem.attr({
-            "x": gi.x,
-            "y": gi.y
-        });
+        updateRects(gi.elem);
     }, function(gi) {
         gi.elem.style({
             "fill": "none",
@@ -54,6 +47,19 @@ function start() {
 
     var tgtCopy = dnd.createTargetType(srcCopy);
     var tgtMove = dnd.createTargetType(srcMove);
+    var tgtAdd = dnd.createTargetType(srcMove);
+
+    function updateRects(sel) {
+        sel.attr({
+            "x": function(d) { return d.x; },
+            "y": function(d) { return d.y; },
+            "width": function(d) { return d.w; },
+            "height": function(d) { return d.h; }
+        }).style({
+            "fill": function(d) { return d.c; },
+            "stroke": "black"
+        });
+    }
 
     var id = 0;
     var nw = 20;
@@ -74,18 +80,11 @@ function start() {
             h: nh
         };
     }));
-    rects.enter().append("rect").attr({
-        "x": function(d) { return d.x; },
-        "y": function(d) { return d.y; },
-        "width": function(d) { return d.w; },
-        "height": function(d) { return d.h; }
-    }).style({
-        "fill": function(d) { return d.c; },
-        "stroke": "black"
-    });
+    rects.enter().append("rect");
     rects.exit().remove();
+    updateRects(rects);
     srcCopy.register(rects);
-    tgtCopy.register(svg, function() {}, function() {}, function(g, _, d, s) {
+    tgtCopy.register(svg, function(g, _, d, s) {
         var newRect = s.append("rect").datum({
             id: id++,
             c: d.c,
@@ -93,23 +92,19 @@ function start() {
             y: g.y,
             w: d.w,
             h: d.h
-        }).attr({
-            "x": g.x,
-            "y": g.y,
-            "width": d.w,
-            "height": d.h
-        }).style({
-            "fill": d.c,
-            "stroke": "black"
         });
+        updateRects(newRect);
         srcMove.register(newRect);
-        tgtMove.register(s, function() {}, function() {}, function(g, sel, d) {
+        tgtMove.register(s, function(g, sel, d) {
             d.x = g.x;
             d.y = g.y;
-            sel.attr({
-                "x": d.x,
-                "y": d.y
-            });
+            updateRects(sel);
+        });
+        tgtAdd.register(newRect, function(_, fs, fo, ts, to) {
+            fs.remove();
+            to.w += fo.w;
+            to.h += fo.h;
+            updateRects(ts);
         });
     });
 
