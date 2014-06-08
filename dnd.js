@@ -139,6 +139,9 @@ function initDnD() {
     return {
         createGhostItem: createGhostItem,
         createSourceType: createSource,
-        createTargetType: createTarget
+        createTargetType: createTarget,
+        clearListeners: function(selection) {
+            selection.on("mouseover", null).on("mouseout", null);
+        }
     };
 }
