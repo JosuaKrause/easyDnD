@@ -68,3 +68,5 @@ groups as well you need to use the following pattern when you update the element
     tgtType0.register(selection);
     tgtType1.register(selection);
     [...]
+
+See `(index.html)[index.html]` for a small usage example.
