@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag &amp; drop test</title>
+    <script src="d3.v3.min.js" charset="utf-8"></script>
+    <script src="dnd.js" charset="utf-8"></script>
+    <meta charset="utf-8">
+</head>
+<body onload="start()">
+
+<svg id="main" width="100%" height="100%"/>
+
+<script>
+function start() {
+    var w = 800;
+    var h = 600;
+    var dnd = initDnD();
+    var svg = d3.select("#main");
+    svg.attr({
+        "viewBox": "0 0 "+w+" "+h
+    });
+
+    var gr = dnd.createGhostItem(svg.append("rect").style({
+        "opacity": 0.5,
+        "fill": "none"
+    }), function(gi, d) {
+        gi.x = d.x;
+        gi.y = d.y;
+        gi.elem.attr({
+            "x": gi.x,
+            "y": gi.y,
+            "width": d.w,
+            "height": d.h
+        }).style({
+            "fill": d.c
+        });
+    }, function(gi, dx, dy) {
+        gi.x += dx;
+        gi.y += dy;
+        gi.elem.attr({
+            "x": gi.x,
+            "y": gi.y
+        });
+    }, function(gi) {
+        gi.elem.style({
+            "fill": "none"
+        })
+    });
+    var srcCopy = dnd.createSourceType(gr, function() {}, function() {}, function() {});
+    var srcMove = dnd.createSourceType(gr, function() {}, function() {}, function() {});
+
+    var tgtCopy = dnd.createTargetType(srcCopy);
+    var tgtMove = dnd.createTargetType(srcMove);
+
+    var id = 0;
+    var nw = 20;
+    var nh = 10;
+    var gap = 2;
+    var rects = svg.selectAll("rect").data([
+        "#a6cee3", "#1f78b4", "#b2df8a",
+        "#33a02c", "#fb9a99", "#e31a1c",
+        "#fdbf6f", "#ff7f00", "#cab2d6",
+        "#6a3d9a", "#ffff99", "#b15928"
+    ].map(function(c, i) {
+        return {
+            id: id++,
+            c: c,
+            x: 0,
+            y: i*(nh + gap),
+            w: nw,
+            h: nh
+        };
+    }));
+    rects.enter().append("rect").attr({
+        "x": function(d) { return d.x; },
+        "y": function(d) { return d.y; },
+        "width": function(d) { return d.w; },
+        "height": function(d) { return d.h; }
+    }).style({
+        "fill": function(d) { return d.c; }
+    });
+    rects.exit().remove();
+    srcCopy.register(rects);
+    tgtCopy.register(svg, function() {}, function() {}, function(g, d) {
+        var newRect = svg.append("rect").datum({
+            id: id++,
+            c: d.c,
+            x: g.x,
+            y: g.y,
+            w: d.w,
+            h: d.h
+        }).attr({
+            "x": g.x,
+            "y": g.y,
+            "width": d.w,
+            "height": d.h
+        }).style({
+            "fill": d.c
+        });
+        srcMove.register(newRect);
+        tgtMove.register(svg, function() {}, function() {}, function(g, d) {
+            d.x = g.x;
+            d.y = g.y;
+            newRect.attr({
+                "x": d.x,
+                "y": d.y
+            });
+        });
+    });
+
+}
+</script>
+
+</body>
+</html>
