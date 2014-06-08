@@ -83,4 +83,8 @@ tgtType1.register(selection);
 [...]
 ```
 
-See [`index.html`](index.html) for a small usage example.
+See [`index.html`](index.html) for a small usage example. Note that the
+dynamically created elements are individually associated with data instead of
+maintaining a data list and updating the visible rectangles via `selectAll([...]).data([...])`.
+This way no bookkeeping on a data list is required (we can remove elements with
+`element.remove()` instead of looking for it in the data and removing it there).
