@@ -1,12 +1,12 @@
 easyDnD
 =======
 
-Easy to use drag and drop functionality for d3.
+Easy to use drag and drop functionality for [d3](https://github.com/mbostock/d3/).
 You can specify source and target objects for
 drag and drop. The functionality is built on top
-of `d3.behavior.drag()`, uses "dragstart", "drag",
-and "dragend" events on sources and "mouseover" and
-"mouseout" events on targets.
+of `d3.behavior.drag()`, uses `"dragstart"`, `"drag"`,
+and `"dragend"` events on sources and `"mouseover"` and
+`"mouseout"` events on targets.
 
 ```javascript
 var dnd = initDnD();
@@ -69,7 +69,7 @@ type. Every element can be associated with multiple targets and need not have
 an associated data item. An element should be registered by a given target
 type only once. If you have to call `register` again at one point you can
 clear the listeners on this element before that with `dnd.clearListeners(selection)`.
-Note that if you want to add normal "mouseover" and "mouseout" events on element
+Note that if you want to add normal `"mouseover"` and `"mouseout"` events on element
 groups as well you need to use the following pattern when you update the elements:
 
 ```javascript
