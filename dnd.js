@@ -7,13 +7,13 @@ function initDnD() {
         dragObj = d;
         dragSel = d3.select(this);
         var src = getSource(dragObj);
-        src.getGhost().show(dragObj, src);
+        src.getGhost().show(dragSel, dragObj);
         src.dragstart(dragSel, dragObj);
         d3.event.sourceEvent.stopPropagation();
     }).on("drag", function() {
         var src = getSource(dragObj);
-        src.getGhost().move(d3.event.dx, d3.event.dy, dragSel, dragObj, src);
-        src.drag(dragObj, src);
+        src.getGhost().move(d3.event.dx, d3.event.dy, dragSel, dragObj);
+        src.drag(dragSel, dragObj);
     }).on("dragend", function() {
         var d = dragObj;
         var t = curTarget;
@@ -22,10 +22,10 @@ function initDnD() {
         curTarget = null;
         var src = getSource(d);
         var g = src.getGhost();
-        g.hide(d, src);
-        src.dragend(s, d, src);
+        g.hide(s, d);
+        src.dragend(s, d);
         if(t !== null) {
-            t.callDrop(g.gi, s, d, src);
+            t.callDrop(g.gi, s, d);
         }
     });
 
@@ -37,13 +37,16 @@ function initDnD() {
         var gi = ghostItem;
         var targets = {};
         var that = {
-            dragstart: dragstart,
-            drag: drag,
-            dragend: dragend,
-            getGhost: function() { return gi; },
-            equals: function(other) {
-                return that === other;
+            dragstart: function(dragSel, dragObj) {
+                dragstart && dragstart(dragSel, dragObj);
             },
+            drag: function(dragSel, dragObj) {
+                drag && drag(dragSel, dragObj);
+            },
+            dragend: function(dragSel, dragObj) {
+                dragend && dragend(dragSel, dragObj);
+            },
+            getGhost: function() { return gi; },
             register: function(selection) {
                 selection.each(function(d) {
                     if(d.__drag_source) {
@@ -80,16 +83,16 @@ function initDnD() {
                     if(dragObj === null) return;
                     var src = getSource(dragObj);
                     if(!src.isTarget(that)) return;
-                    curTargetSel = d3.select(this);
-                    hover(curTargetSel, dragObj, src);
                     curTarget = that;
+                    curTargetSel = d3.select(this);
                     curTargetObj = this;
+                    hover(dragSel, dragObj, curTargetSel, curTargetObj);
                     if(curTargetObj.__drop_target === undefined) {
                         curTargetObj.__drop_target = {};
                     }
-                    curTargetObj.__drop_target[id] = function(g, dragSel, dragObj, src) {
-                        drop(g, dragSel, dragObj, src, curTargetSel, curTargetObj, that);
-                        leave(curTargetSel, curTargetObj, dragObj, src);
+                    curTargetObj.__drop_target[id] = function(g, dragSel, dragObj) {
+                        drop(g, dragSel, dragObj, curTargetSel, curTargetObj);
+                        leave(dragSel, dragObj, curTargetSel, curTargetObj);
                     };
                 }).on("mouseout", function(d, i) {
                     if(mot !== undefined) {
@@ -100,14 +103,14 @@ function initDnD() {
                     if(!src.isTarget(that)) return;
                     if(curTarget !== that) return;
                     if(curTargetObj !== this) return;
-                    leave(curTargetSel, curTargetObj, dragObj, src);
+                    leave(dragSel, dragObj, curTargetSel, curTargetObj);
                     curTarget = null;
                     curTargetObj = null;
                     curTargetSel = null;
                 });
             },
-            callDrop: function(g, dragSel, dragObj, src) {
-                curTargetObj.__drop_target[id](g, dragSel, dragObj, src);
+            callDrop: function(g, dragSel, dragObj) {
+                curTargetObj.__drop_target[id](g, dragSel, dragObj);
                 curTargetObj = null;
                 curTargetSel = null;
             }
@@ -121,14 +124,14 @@ function initDnD() {
             elem: selection
         };
         return {
-            show: function(obj, src) {
-                show(gi, obj, src);
+            show: function(sel, obj) {
+                show(gi, sel, obj);
             },
-            move: function(dx, dy, obj, src) {
-                move(gi, dx, dy, obj, src);
+            move: function(dx, dy, sel, obj) {
+                move(gi, dx, dy, sel, obj);
             },
-            hide: function(obj, src) {
-                hide(gi, obj, src);
+            hide: function(sel, obj) {
+                hide(gi, sel, obj);
             },
             gi: gi
         };

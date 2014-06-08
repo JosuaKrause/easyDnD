@@ -24,7 +24,7 @@ function start() {
         "opacity": 0.5,
         "fill": "none",
         "stroke": "none"
-    }), function(gi, d) {
+    }), function(gi, _, d) {
         gi.x = d.x;
         gi.y = d.y;
         gi.elem.attr({
@@ -49,8 +49,8 @@ function start() {
             "stroke": "none"
         })
     });
-    var srcCopy = dnd.createSourceType(gr, function() {}, function() {}, function() {});
-    var srcMove = dnd.createSourceType(gr, function() {}, function() {}, function() {});
+    var srcCopy = dnd.createSourceType(gr);
+    var srcMove = dnd.createSourceType(gr);
 
     var tgtCopy = dnd.createTargetType(srcCopy);
     var tgtMove = dnd.createTargetType(srcMove);
@@ -85,7 +85,7 @@ function start() {
     });
     rects.exit().remove();
     srcCopy.register(rects);
-    tgtCopy.register(svg, function() {}, function() {}, function(g, _, d, _, s) {
+    tgtCopy.register(svg, function() {}, function() {}, function(g, _, d, s) {
         var newRect = s.append("rect").datum({
             id: id++,
             c: d.c,
