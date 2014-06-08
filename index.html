@@ -24,7 +24,7 @@ function start() {
     var nw = 20;
     var nh = 10;
     var gap = 2;
-    var rects = svg.selectAll("rect").data([
+    var rects = svg.selectAll(".proto").data([
         "#a6cee3", "#1f78b4", "#b2df8a",
         "#33a02c", "#fb9a99", "#e31a1c",
         "#fdbf6f", "#ff7f00", "#cab2d6",
@@ -39,10 +39,10 @@ function start() {
             h: nh
         };
     }));
-    rects.enter().append("rect");
+    rects.enter().append("rect").classed("proto", true);
     rects.exit().remove();
 
-    var gr = dnd.createGhostItem(svg.append("rect").style({
+    var gr = dnd.createGhostItem(svg.append("rect").classed("ghost", true).style({
         "opacity": 0.5,
         "fill": "none",
         "stroke": "none"
@@ -75,7 +75,7 @@ function start() {
     });
 
     var tgtCopy = dnd.createTargetType(srcCopy, function(g, _, d, s) {
-        var newRect = s.append("rect").datum({
+        var newRect = s.append("rect").classed("moveable", true).datum({
             id: id++,
             c: d.c,
             x: g.x,
