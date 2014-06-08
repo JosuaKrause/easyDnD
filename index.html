@@ -20,6 +20,28 @@ function start() {
         "viewBox": "0 0 "+w+" "+h
     });
 
+    var id = 0;
+    var nw = 20;
+    var nh = 10;
+    var gap = 2;
+    var rects = svg.selectAll("rect").data([
+        "#a6cee3", "#1f78b4", "#b2df8a",
+        "#33a02c", "#fb9a99", "#e31a1c",
+        "#fdbf6f", "#ff7f00", "#cab2d6",
+        "#6a3d9a", "#ffff99", "#b15928"
+    ].map(function(c, i) {
+        return {
+            id: id++,
+            c: c,
+            x: 0,
+            y: i*(nh + gap),
+            w: nw,
+            h: nh
+        };
+    }));
+    rects.enter().append("rect");
+    rects.exit().remove();
+
     var gr = dnd.createGhostItem(svg.append("rect").style({
         "opacity": 0.5,
         "fill": "none",
@@ -43,11 +65,48 @@ function start() {
         })
     });
     var srcCopy = dnd.createSourceType(gr);
-    var srcMove = dnd.createSourceType(gr);
+    var srcMove = dnd.createSourceType(gr, function(sel) {
+        sel.style({
+            "fill": "none",
+            "stroke": "none"
+        })
+    }, function(sel) {
+        updateRects(sel);
+    });
 
-    var tgtCopy = dnd.createTargetType(srcCopy);
-    var tgtMove = dnd.createTargetType(srcMove);
-    var tgtAdd = dnd.createTargetType(srcMove);
+    var tgtCopy = dnd.createTargetType(srcCopy, function(g, _, d, s) {
+        var newRect = s.append("rect").datum({
+            id: id++,
+            c: d.c,
+            x: g.x,
+            y: g.y,
+            w: d.w,
+            h: d.h
+        });
+        updateRects(newRect);
+        srcMove.register(newRect);
+        tgtMove.register(s);
+        tgtAdd.register(newRect);
+    });
+    var tgtMove = dnd.createTargetType(srcMove, function(g, sel, d) {
+        d.x = g.x;
+        d.y = g.y;
+        updateRects(sel);
+    });
+    var tgtAdd = dnd.createTargetType(srcMove, function(_, fs, fo, ts, to) {
+        fs.remove();
+        to.w += fo.w;
+        to.h += fo.h;
+        updateRects(ts);
+    }, function(_, so, sel, to) {
+        if(so === to) return;
+        sel.style({
+            "fill": "silver"
+        });
+    }, function(_, so, sel, to) {
+        if(so === to) return;
+        updateRects(sel);
+    });
 
     function updateRects(sel) {
         sel.attr({
@@ -61,52 +120,9 @@ function start() {
         });
     }
 
-    var id = 0;
-    var nw = 20;
-    var nh = 10;
-    var gap = 2;
-    var rects = svg.selectAll("rect").data([
-        "#a6cee3", "#1f78b4", "#b2df8a",
-        "#33a02c", "#fb9a99", "#e31a1c",
-        "#fdbf6f", "#ff7f00", "#cab2d6",
-        "#6a3d9a", "#ffff99", "#b15928"
-    ].map(function(c, i) {
-        return {
-            id: id++,
-            c: c,
-            x: 0,
-            y: i*(nh + gap),
-            w: nw,
-            h: nh
-        };
-    }));
-    rects.enter().append("rect");
-    rects.exit().remove();
     updateRects(rects);
     srcCopy.register(rects);
-    tgtCopy.register(svg, function(g, _, d, s) {
-        var newRect = s.append("rect").datum({
-            id: id++,
-            c: d.c,
-            x: g.x,
-            y: g.y,
-            w: d.w,
-            h: d.h
-        });
-        updateRects(newRect);
-        srcMove.register(newRect);
-        tgtMove.register(s, function(g, sel, d) {
-            d.x = g.x;
-            d.y = g.y;
-            updateRects(sel);
-        });
-        tgtAdd.register(newRect, function(_, fs, fo, ts, to) {
-            fs.remove();
-            to.w += fo.w;
-            to.h += fo.h;
-            updateRects(ts);
-        });
-    });
+    tgtCopy.register(svg);
 
 }
 </script>

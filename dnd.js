@@ -33,7 +33,7 @@ function initDnD() {
         return d.__drag_source;
     }
 
-    function createSource(ghostItem, dragstart, drag, dragend) {
+    function createSource(ghostItem, dragstart, dragend, drag) {
         var gi = ghostItem;
         var targets = {};
         var that = {
@@ -69,11 +69,11 @@ function initDnD() {
     var curTarget = null;
     var curTargetObj = null;
     var curTargetSel = null;
-    function createTarget(source) {
+    function createTarget(source, drop, hover, leave) {
         var id = targetCount++;
         var that = {
             id: function() { return id; },
-            register: function(selection, drop, hover, leave) {
+            register: function(selection) {
                 var mor = selection.on("mouseover");
                 var mot = selection.on("mouseout");
                 selection.on("mouseover", function(d, i) {
@@ -86,28 +86,27 @@ function initDnD() {
                     curTarget = that;
                     curTargetSel = d3.select(this);
                     curTargetObj = this;
-                    hover && hover(dragSel, dragObj, curTargetSel, curTargetObj);
+                    hover && hover(dragSel, dragObj, curTargetSel, d);
                     if(curTargetObj.__drop_target === undefined) {
                         curTargetObj.__drop_target = {};
                     }
                     curTargetObj.__drop_target[id] = function(g, dragSel, dragObj) {
-                        drop(g, dragSel, dragObj, curTargetSel, curTargetObj);
-                        leave && leave(dragSel, dragObj, curTargetSel, curTargetObj);
+                        drop(g, dragSel, dragObj, curTargetSel, d);
+                        leave && leave(dragSel, dragObj, curTargetSel, d);
                     };
-                }).on("mouseout", function(d, i) {
+                }, true).on("mouseout", function(d, i) {
                     if(mot !== undefined) {
                         mot.bind(this)(d, i);
                     }
                     if(dragObj === null) return;
                     var src = getSource(dragObj);
                     if(!src.isTarget(that)) return;
-                    if(curTarget !== that) return;
-                    if(curTargetObj !== this) return;
-                    leave && leave(dragSel, dragObj, curTargetSel, curTargetObj);
+                    leave && leave(dragSel, dragObj, d3.select(this), d);
+                    if(this !== curTargetObj) return;
                     curTarget = null;
                     curTargetObj = null;
                     curTargetSel = null;
-                });
+                }, true);
             },
             callDrop: function(g, dragSel, dragObj) {
                 curTargetObj.__drop_target[id](g, dragSel, dragObj);
