@@ -151,7 +151,7 @@ function initDnD() {
         applyTemplate: function(template, selection, mouseover, mouseout) {
             if(template.source) {
                 selection.each(function(d) {
-                    d.__drag_source = source;
+                    d.__drag_source = template.source;
                 });
                 selection.call(dragListener);
             }
