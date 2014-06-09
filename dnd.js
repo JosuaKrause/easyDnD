@@ -117,14 +117,6 @@ function initDnD() {
         gi.elem.datum(gi);
         return {
             show: function(sel, obj) {
-                selection.sort(function(a, b) {
-                    var ga = a === gi;
-                    var gb = b === gi;
-                    if(ga) {
-                        return gb ? 0 : 1;
-                    }
-                    return gb ? -1 : 0;
-                });
                 show(gi, sel, obj);
             },
             move: function(dx, dy, sel, obj) {
