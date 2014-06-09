@@ -50,14 +50,11 @@ function initDnD() {
                 dragend && dragend(dragSel, dragObj);
             },
             getGhost: function() { return gi; },
-            register: function(selection) {
-                selection.each(function(d) {
-                    if(d.__drag_source) {
-                        console.warn(d, "element cannot be associated with multiple sources");
-                    }
-                    d.__drag_source = that;
-                });
-                selection.call(dragListener);
+            register: function(template) {
+                if(template.source) {
+                    console.warn(template, "template cannot be associated with multiple sources");
+                }
+                template.source = that;
             },
             addTarget: function(target) {
                 targets[target.id()] = that;
@@ -76,13 +73,11 @@ function initDnD() {
         var id = targetCount++;
         var that = {
             id: function() { return id; },
-            register: function(selection) {
-                var mor = selection.on("mouseover");
-                var mot = selection.on("mouseout");
-                selection.on("mouseover", function(d, i) {
-                    if(mor !== undefined) {
-                        mor.bind(this)(d, i);
-                    }
+            register: function(template) {
+                var mor = template.mouseover;
+                var mot = template.mouseout;
+                template.mouseover = function(d, i) {
+                    mor && mor.bind(this)(d, i);
                     if(dragObj === null) return;
                     var src = getSource(dragObj);
                     if(!src.isTarget(that)) return;
@@ -97,10 +92,9 @@ function initDnD() {
                         drop(g, dragSel, dragObj, curTargetSel, d);
                         leave && leave(dragSel, dragObj, curTargetSel, d);
                     };
-                }, true).on("mouseout", function(d, i) {
-                    if(mot !== undefined) {
-                        mot.bind(this)(d, i);
-                    }
+                };
+                template.mouseout = function(d, i) {
+                    mot && mot.bind(this)(d, i);
                     if(dragObj === null) return;
                     var src = getSource(dragObj);
                     if(!src.isTarget(that)) return;
@@ -109,7 +103,7 @@ function initDnD() {
                     curTarget = null;
                     curTargetObj = null;
                     curTargetSel = null;
-                }, true);
+                };
             },
             callDrop: function(g, dragSel, dragObj) {
                 curTargetObj.__drop_target[id](g, dragSel, dragObj);
@@ -151,8 +145,25 @@ function initDnD() {
         createGhostItem: createGhostItem,
         createSourceType: createSource,
         createTargetType: createTarget,
-        clearListeners: function(selection) {
-            selection.on("mouseover", null).on("mouseout", null);
+        initTemplate: function() {
+            return {};
+        },
+        applyTemplate: function(template, selection, mouseover, mouseout) {
+            if(template.source) {
+                selection.each(function(d) {
+                    d.__drag_source = source;
+                });
+                selection.call(dragListener);
+            }
+            var mor = template.mouseover ? function(d, i) {
+                mouseover && mouseover.bind(this)(d, i);
+                template.mouseover.bind(this)(d, i);
+            } : mouseover ? mouseover : null;
+            var mot = template.mouseout ? function(d, i) {
+                mouseout && mouseout.bind(this)(d, i);
+                template.mouseout.bind(this)(d, i);
+            } : mouseout ? mouseout : null;
+            selection.on("mouseover", mor, true).on("mouseout", mot, true);
         }
     };
 }

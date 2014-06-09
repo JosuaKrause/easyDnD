@@ -86,9 +86,7 @@ function start() {
             h: d.h
         });
         updateRects(newRect);
-        srcMove.register(newRect);
-        tgtMove.register(s);
-        tgtAdd.register(newRect);
+        dnd.applyTemplate(moveTemplate, newRect);
     });
     var tgtMove = dnd.createTargetType(srcMove, function(g, sel, d) {
         d.x = g.x;
@@ -123,8 +121,17 @@ function start() {
     }
 
     updateRects(rects);
-    srcCopy.register(rects);
-    tgtCopy.register(svg);
+
+    var svgTemplate = dnd.initTemplate();
+    tgtCopy.register(svgTemplate);
+    tgtMove.register(svgTemplate);
+    dnd.applyTemplate(svgTemplate, svg);
+    var copyTemplate = dnd.initTemplate();
+    srcCopy.register(copyTemplate);
+    dnd.applyTemplate(copyTemplate, rects);
+    var moveTemplate = dnd.initTemplate();
+    srcMove.register(moveTemplate);
+    tgtAdd.register(moveTemplate);
 }
 </script>
 
