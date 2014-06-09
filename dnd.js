@@ -27,9 +27,7 @@ function initDnD() {
         var g = src.getGhost();
         g.hide(s, d);
         src.dragend(s, d);
-        if(t !== null) {
-            t.callDrop(g.gi, s, d);
-        }
+        t && t.callDrop(g.gi, s, d);
     });
 
     function getSource(d) {
@@ -51,9 +49,7 @@ function initDnD() {
             },
             getGhost: function() { return gi; },
             register: function(template) {
-                if(template.source) {
-                    console.warn(template, "template cannot be associated with multiple sources");
-                }
+                template.source && console.warn(template, "template cannot be associated with multiple sources");
                 template.source = that;
             },
             addTarget: function(target) {
