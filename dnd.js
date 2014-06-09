@@ -118,10 +118,9 @@ function initDnD() {
         return that;
     }
 
-    function createGhostItem(selection, show, move, hide) {
-        var gi = {
-            elem: selection
-        };
+    function createGhostItem(create, show, move, hide) {
+        var gi = {};
+        gi.elem = create(gi);
         return {
             show: function(sel, obj) {
                 show(gi, sel, obj);

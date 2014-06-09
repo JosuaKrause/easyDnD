@@ -42,11 +42,13 @@ function start() {
     rects.enter().append("rect").classed("proto", true);
     rects.exit().remove();
 
-    var gr = dnd.createGhostItem(svg.append("rect").classed("ghost", true).style({
-        "opacity": 0.5,
-        "fill": "none",
-        "stroke": "none"
-    }), function(gi, _, d) {
+    var gr = dnd.createGhostItem(function(gi) {
+        return svg.append("rect").classed("ghost", true).style({
+            "opacity": 0.5,
+            "fill": "none",
+            "stroke": "none"
+        });
+    }, function(gi, _, d) {
         gi.x = d.x;
         gi.y = d.y;
         gi.w = d.w;
@@ -62,7 +64,7 @@ function start() {
         gi.elem.style({
             "fill": "none",
             "stroke": "none"
-        })
+        });
     });
     var srcCopy = dnd.createSourceType(gr);
     var srcMove = dnd.createSourceType(gr, function(sel) {
