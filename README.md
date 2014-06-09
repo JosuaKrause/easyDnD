@@ -15,12 +15,14 @@ var dnd = initDnD();
 Creates the drag & drop environment.
 
 ```javascript
-var ghostItem = dnd.createGhostItem(create, show, move, hide);
+var ghostItem = dnd.createGhostItem(selection, create, show, move, hide);
 ```
 
 Creates a ghost item that is shown during the drag operation. The
-first argument is a function creating a selection containing the item
-with the (empty) ghost item state as argument. The next
+first argument is the selection where the ghost item will be added. The
+second argument is a function creating a selection containing the item
+with the selection and the (empty) ghost item state as argument. The
+created selection will have the ghost item state as datum. The next
 three arguments are callbacks that are called during the drag & drop
 operation. The arguments to these callbacks are an ghost object that
 can be used to store information about the state of the ghost item

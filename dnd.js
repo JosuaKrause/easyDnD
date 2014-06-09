@@ -1,3 +1,6 @@
+/**
+ * Created by krause on 2014-06-07.
+ */
 
 function initDnD() {
     var targetCount = 0;
@@ -118,11 +121,20 @@ function initDnD() {
         return that;
     }
 
-    function createGhostItem(create, show, move, hide) {
+    function createGhostItem(selection, create, show, move, hide) {
         var gi = {};
-        gi.elem = create(gi);
+        gi.elem = create(selection, gi);
+        gi.elem.datum(gi);
         return {
             show: function(sel, obj) {
+                selection.sort(function(a, b) {
+                    var ga = a === gi;
+                    var gb = b === gi;
+                    if(ga) {
+                        return gb ? 0 : 1;
+                    }
+                    return gb ? -1 : 0;
+                });
                 show(gi, sel, obj);
             },
             move: function(dx, dy, sel, obj) {

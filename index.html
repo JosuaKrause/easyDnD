@@ -42,8 +42,8 @@ function start() {
     rects.enter().append("rect").classed("proto", true);
     rects.exit().remove();
 
-    var gr = dnd.createGhostItem(function(gi) {
-        return svg.append("rect").classed("ghost", true).style({
+    var gr = dnd.createGhostItem(svg, function(sel, gi) {
+        return sel.append("rect").classed("ghost", true).style({
             "opacity": 0.5,
             "fill": "none",
             "stroke": "none"
