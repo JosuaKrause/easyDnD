@@ -53,7 +53,7 @@ function initDnD() {
                 template.source = that;
             },
             addTarget: function(target) {
-                targets[target.id()] = that;
+                targets[target.id()] = true;
             },
             isTarget: function(target) {
                 return target.id() in targets;
