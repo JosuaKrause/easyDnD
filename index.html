@@ -14,7 +14,7 @@
 function start() {
     var w = 800;
     var h = 144;
-    var dnd = initDnD();
+    var dnd = new DnD();
     var svg = d3.select("#main");
     svg.attr({
         "viewBox": "0 0 "+w+" "+h
@@ -33,7 +33,7 @@ function start() {
         return {
             id: id++,
             c: c,
-            x: 0,
+            x: 1,
             y: i*(nh + gap),
             w: nw,
             h: nh
@@ -42,7 +42,7 @@ function start() {
     rects.enter().append("rect").classed("proto", true);
     rects.exit().remove();
 
-    var gr = dnd.createGhostItem(svg, function(sel, gi) {
+    var gr = new dnd.GhostItem(svg, function(sel, gi) {
         return sel.append("rect").classed("ghost", true).style({
             "opacity": 0.5,
             "fill": "none",
@@ -66,8 +66,8 @@ function start() {
             "stroke": "none"
         });
     });
-    var srcCopy = dnd.createSourceType(gr);
-    var srcMove = dnd.createSourceType(gr, function(sel) {
+    var srcCopy = new dnd.Source(gr);
+    var srcMove = new dnd.Source(gr, function(sel) {
         sel.style({
             "fill": "none",
             "stroke": "none"
@@ -76,7 +76,7 @@ function start() {
         updateRects(sel);
     });
 
-    var tgtCopy = dnd.createTargetType(srcCopy, function(g, _, d, s) {
+    var tgtCopy = new dnd.Target(srcCopy, function(g, _, d, s) {
         var newRect = s.append("rect").classed("moveable", true).datum({
             id: id++,
             c: d.c,
@@ -86,14 +86,14 @@ function start() {
             h: d.h
         });
         updateRects(newRect);
-        dnd.applyTemplate(moveTemplate, newRect);
+        moveTemplate.apply(newRect);
     });
-    var tgtMove = dnd.createTargetType(srcMove, function(g, sel, d) {
+    var tgtMove = new dnd.Target(srcMove, function(g, sel, d) {
         d.x = g.x;
         d.y = g.y;
         updateRects(sel);
     });
-    var tgtAdd = dnd.createTargetType(srcMove, function(_, fs, fo, ts, to) {
+    var tgtAdd = new dnd.Target(srcMove, function(_, fs, fo, ts, to) {
         fs.remove();
         to.w += fo.w;
         to.h += fo.h;
@@ -122,14 +122,14 @@ function start() {
 
     updateRects(rects);
 
-    var svgTemplate = dnd.initTemplate();
+    var svgTemplate = new dnd.Template();
     tgtCopy.register(svgTemplate);
     tgtMove.register(svgTemplate);
-    dnd.applyTemplate(svgTemplate, svg);
-    var copyTemplate = dnd.initTemplate();
+    svgTemplate.apply(svg);
+    var copyTemplate = new dnd.Template();
     srcCopy.register(copyTemplate);
-    dnd.applyTemplate(copyTemplate, rects);
-    var moveTemplate = dnd.initTemplate();
+    copyTemplate.apply(rects);
+    var moveTemplate = new dnd.Template();
     srcMove.register(moveTemplate);
     tgtAdd.register(moveTemplate);
 }

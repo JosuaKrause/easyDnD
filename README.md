@@ -9,13 +9,13 @@ and `"dragend"` events on sources and `"mouseover"` and
 `"mouseout"` events on targets.
 
 ```javascript
-var dnd = initDnD();
+var dnd = new DnD();
 ```
 
 Creates the drag & drop environment.
 
 ```javascript
-var ghostItem = dnd.createGhostItem(selection, create, show, move, hide);
+var ghostItem = new dnd.GhostItem(selection, create, show, move, hide);
 ```
 
 Creates a ghost item that is shown during the drag operation. The
@@ -32,7 +32,7 @@ of all three callbacks are the single source selection and the
 associated source data item.
 
 ```javascript
-var srcType = dnd.createSourceType(ghostItem, dragstart, dragend, drag);
+var srcType = new dnd.Source(ghostItem, dragstart, dragend, drag);
 ```
 
 Creates a source type. The first argument is a previously created ghost item.
@@ -40,7 +40,7 @@ The next arguments are callbacks for the drag & drop operation. The callbacks
 are called with the single source selection and the associated source data item.
 
 ```javascript
-var template = dnd.initTemplate();
+var template = new dnd.Template();
 ```
 
 Initializes a new template.
@@ -54,7 +54,7 @@ Every template can have only one source type and when the template
 is applied to a selection all elements need an associated data item.
 
 ```javascript
-var tgtType = dnd.createTarget(source, drop, hover, leave);
+var tgtType = new dnd.Target(source, drop, hover, leave);
 ```
 
 Creates a target type. The first argument is the associated source type.
@@ -76,13 +76,13 @@ tgtType.register(template);
 Registers a template as dragging target of the given type.
 Every template can be associated with multiple targets and when the template
 is applied to a selection the elements don't need an associated data item.
-An template should be registered by a given target type only once.
+A template should be registered by a given target type only once.
 
 ```javascript
-dnd.applyTemplate(template, selection, mouseover, mouseout);
+template.apply(selection, mouseover, mouseout);
 ```
 
-Applies the template to the given selection. This call resets the
+Applies `template` to the given selection. This call resets the
 `"mouseover"` and `"mouseout"` events of all elements in the selection.
 If no target type is associated with the template those listeners will
 be cleared or set to the optional `mouseover` and `mouseout` arguments
