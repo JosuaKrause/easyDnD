@@ -109,7 +109,7 @@ function DnD() {
         curTargetObj.__drop_target[this.id()](g, dragSel, dragObj);
         curTargetObj = null;
         curTargetSel = null;
-    }
+    };
 
     function GhostItem(selection, create, show, move, hide) {
         var gi = {};
@@ -151,7 +151,7 @@ function DnD() {
             template.mouseout(node, d, i);
         } : mouseout ? mouseout : null;
         selection.on("mouseover", mor, true).on("mouseout", mot, true);
-    }
+    };
 
     this.GhostItem = GhostItem;
     this.Source = Source;
